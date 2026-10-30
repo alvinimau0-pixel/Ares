@@ -1,4 +1,4 @@
-const { send, cors, originAllowed, requireSession } = require("./_lib/security");
+const { send, cors, originAllowed, requireSession } = require("../lib/security");
 
 module.exports = async function handler(req, res) {
   cors(req, res);
