@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
   const token = process.env.VERCEL_OIDC_TOKEN || process.env.AI_GATEWAY_API_KEY;
   const model = String(req.body && req.body.model || process.env.AI_GATEWAY_MODEL || "");
   if (!token) return send(res, 503, { error: "AI Gateway authentication is not configured. Vercel OIDC or AI_GATEWAY_API_KEY is required.", code: "AI_NOT_CONFIGURED" });
-  if (!model || model.length > 180 || !/^[a-zA-Z0-9._-]+\\/[a-zA-Z0-9._:-]+$/.test(model)) return send(res, 400, { error: "Choose a valid provider/model ID from the live model catalogue." });
+  if (!model || model.length > 180 || !/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._:-]+$/.test(model)) return send(res, 400, { error: "Choose a valid provider/model ID from the live model catalogue." });
   
   const messages = req.body && req.body.messages;
   if (!Array.isArray(messages) || !messages.length || messages.length > 30) return send(res, 400, { error: "Send between 1 and 30 chat messages." });
