@@ -114,7 +114,8 @@ document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>window.open(
 $('#closePop').onclick=()=>popup.classList.remove('open');
 $('#orb').onclick=()=>{orb.classList.toggle('listening');setTimeout(()=>orb.classList.remove('listening'),1600);toast('Jarvis core activated')};
 const chatHistory=[];$('#chatForm').onsubmit=async e=>{e.preventDefault();const q=$('#chatInput').value.trim();if(!q)return;$('#chatInput').value='';openPanel('chat');popTitle.textContent='Chat with Ares';popBody.innerHTML='<div class="card"><div class="note" id="chatReply">Ares is thinking…</div></div><button class="action" id="signInChat">Sign in</button>';const target=$('#chatReply');try{chatHistory.push({role:'user',content:q});const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory.slice(-20),model:cfg.aiModel||undefined})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Chat request failed');chatHistory.push({role:'assistant',content:d.reply});target.textContent=d.reply||'No response received.'}catch(err){target.textContent=err.message;const b=$('#signInChat');if(b)b.onclick=()=>openPanel('auth')}};
-$('#micButton').onclick=()=>openPanel('ears');\ndocument.querySelector('.profile').onclick=()=>openPanel('auth');
+$('#micButton').onclick=()=>openPanel('ears');
+document.querySelector('.profile').onclick=()=>openPanel('auth');
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');toast(b.dataset.tab+' workspace selected')});
 $('#saveFlow').onclick=()=>toast('Workflow draft saved in this session');
 $('#deployFlow').onclick=()=>toast('Connect n8n backend to deploy workflows');
