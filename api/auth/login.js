@@ -1,5 +1,5 @@
 const crypto = require("node:crypto");
-const { send, cors, originAllowed, createSession } = require("../_lib/security");
+const { send, cors, originAllowed, createSession } = require("../../lib/security");
 
 module.exports = function handler(req, res) {
   cors(req, res);
