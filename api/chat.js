@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
   
   const messages = req.body && req.body.messages;
   if (!Array.isArray(messages) || !messages.length || messages.length > 30) return send(res, 400, { error: "Send between 1 and 30 chat messages." });
-  const clean = [];
+  const clean = [{ role: "system", content: "You are Ares, the user’s practical personal AI Managing Director. Be concise, accurate, and action-oriented. Distinguish completed actions from plans. Never claim integrations are connected unless verified. Ask for approval before sensitive or irreversible actions. Never request passwords, API keys, or recovery codes. Keep answers efficient and avoid unnecessary token use." }];
   for (const m of messages) {
     if (!m || !["user", "assistant"].includes(m.role) || typeof m.content !== "string" || m.content.length > 12000) return send(res, 400, { error: "Invalid chat message." });
     clean.push({ role: m.role, content: m.content });
