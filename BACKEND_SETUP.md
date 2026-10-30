@@ -9,7 +9,8 @@ This repository now includes Vercel serverless API routes. The frontend stays st
 - `GET /api/auth/session` — checks the session.
 - `POST /api/auth/logout` — clears the session.
 - `POST /api/voice-token` — authenticated server-side ElevenLabs signed-URL exchange.
-- `POST /api/chat` — authenticated Vercel AI Gateway Chat Completions proxy.
+- `GET /api/models` — authenticated live AI Gateway language-model catalogue.
+- `POST /api/chat` — authenticated Vercel AI Gateway Chat Completions proxy with selectable model IDs and a concise Ares system policy.
 - `GET|POST /api/memory` — authenticated memory access via Supabase REST.
 
 All mutating/integration routes validate the request origin and require the Ares session. No browser-side provider key is accepted.
@@ -24,8 +25,9 @@ Set these in Vercel Project → Settings → Environment Variables. Use **Sensit
 | `ARES_SESSION_SECRET` | Random secret, at least 32 characters |
 | `ELEVENLABS_API_KEY` | Server-only ElevenLabs API key |
 | `ELEVENLABS_AGENT_ID` | Existing Ares agent ID |
-| `AI_GATEWAY_API_KEY` | Vercel AI Gateway API key |
-| `AI_GATEWAY_MODEL` | Exact model ID available to the Gateway team |
+| `AI_GATEWAY_API_KEY` | Optional AI Gateway API key for non-OIDC deployments |
+| `AI_GATEWAY_MODEL` | Optional default exact model ID; the Settings panel can select from the live catalogue |
+| `VERCEL_OIDC_TOKEN` | Automatically provided to eligible Vercel deployments; preferred over a static Gateway key |
 | `SUPABASE_URL` | Dedicated Ares Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Dedicated Ares project service-role key; server only |
 | `ARES_OWNER_ID` | UUID of the Ares owner in Supabase Auth |
@@ -42,7 +44,7 @@ The migration enables RLS and scopes authenticated-user access by `auth.uid()`. 
 
 ## Current limits
 
-- Chat uses non-streaming Chat Completions; tool calling and model failover are not wired yet.
+- Chat uses non-streaming Chat Completions, a live model catalogue, a selectable model, and a 900-token output ceiling. Tool calling, streaming, provider failover policy, and team spend budgets are not wired yet.
 - Voice-token route is ready, but the ElevenLabs widget must be switched to signed-session startup before enabling mandatory agent auth.
 - Memory routes are ready after a dedicated Supabase project and owner are provisioned.
 - n8n execution and Obsidian access are intentionally not proxied until their private endpoints and credentials are configured.
