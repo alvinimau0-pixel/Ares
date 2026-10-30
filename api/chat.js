@@ -6,9 +6,11 @@ module.exports = async function handler(req, res) {
   if (!originAllowed(req)) return send(res, 403, { error: "Origin not allowed" });
   if (req.method !== "POST") return send(res, 405, { error: "Method not allowed" }, { Allow: "POST, OPTIONS" });
   if (!requireSession(req, res)) return;
-  const key = process.env.AI_GATEWAY_API_KEY;
-  const model = process.env.AI_GATEWAY_MODEL;
-  if (!key || !model) return send(res, 503, { error: "Vercel AI Gateway is not configured. Set AI_GATEWAY_API_KEY and AI_GATEWAY_MODEL.", code: "AI_NOT_CONFIGURED" });
+  const token = process.env.VERCEL_OIDC_TOKEN || process.env.AI_GATEWAY_API_KEY;
+  const model = String(req.body && req.body.model || process.env.AI_GATEWAY_MODEL || "");
+  if (!token) return send(res, 503, { error: "AI Gateway authentication is not configured. Vercel OIDC or AI_GATEWAY_API_KEY is required.", code: "AI_NOT_CONFIGURED" });
+  if (!model || model.length > 180 || !/^[a-zA-Z0-9._-]+\\/[a-zA-Z0-9._:-]+$/.test(model)) return send(res, 400, { error: "Choose a valid provider/model ID from the live model catalogue." });
+  
   const messages = req.body && req.body.messages;
   if (!Array.isArray(messages) || !messages.length || messages.length > 30) return send(res, 400, { error: "Send between 1 and 30 chat messages." });
   const clean = [];
@@ -19,8 +21,8 @@ module.exports = async function handler(req, res) {
   try {
     const upstream = await fetch("https://ai-gateway.vercel.sh/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model, messages: clean, temperature: 0.4, max_tokens: 1200 })
+      headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ model, messages: clean, temperature: 0.4, max_tokens: 900 })
     });
     const data = await upstream.json().catch(() => ({}));
     if (!upstream.ok) return send(res, upstream.status, { error: data.error?.message || "AI Gateway request failed." });
