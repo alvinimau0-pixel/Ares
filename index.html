@@ -109,7 +109,7 @@ on('openGit',()=>window.open('https://github.com/alvinimau0-pixel/Ares','_blank'
 on('openDeploy',()=>window.open('https://ares-intelligence.vercel.app','_blank','noopener'));
 }
 document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));
-document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(b.dataset.view==='chat')openPanel('voice');else popup.classList.remove('open')}));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(b.dataset.view==='chat')openPanel('chat');else popup.classList.remove('open')}));
 document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>window.open(b.dataset.action==='github'?'https://github.com/alvinimau0-pixel/Ares':'https://ares-intelligence.vercel.app','_blank','noopener'));
 $('#closePop').onclick=()=>popup.classList.remove('open');
 $('#orb').onclick=()=>{orb.classList.toggle('listening');setTimeout(()=>orb.classList.remove('listening'),1600);toast('Jarvis core activated')};
