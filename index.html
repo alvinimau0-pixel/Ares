@@ -79,6 +79,7 @@ function toast(t){let x=$('#toast');x.textContent=t;x.classList.add('show');setT
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem('ares-config',JSON.stringify(cfg))}
 const views={
+chat:['Chat with Ares','<div class="card"><b>Private AI chat</b><p class="note">Your messages use the authenticated Ares backend.</p></div>'],
 voice:['Chat / Voice','<div class="card"><b>ElevenLabs · Ares voice agent</b><p class="note">Secure session startup through the Ares backend. Sign in first.</p><button class="action" id="startAresVoice">Start voice session</button> <button class="action" id="endAresVoice">End session</button><p class="note" id="voiceStatus">Voice is offline.</p><div id="voiceTranscript" class="note"></div></div>'],
 ears:['Ears · Listening',`<div class="card"><b>Browser speech recognition</b><p id="transcript" class="note">Microphone is off. Start listening when ready.</p><button class="action" id="startListen">Start listening</button> <button class="action" id="stopListen">Stop</button></div>`],
 vision:['Eye · Vision',`<div class="card"><b>Local camera preview</b><video id="camera" autoplay playsinline muted style="width:100%;max-height:220px;background:#020712;border-radius:10px;margin:10px 0"></video><button class="action" id="startCamera">Enable camera</button> <button class="action" id="stopCamera">Stop camera</button><p class="note">Local preview only. Image understanding and secure frame transfer are not connected yet.</p></div>`],
