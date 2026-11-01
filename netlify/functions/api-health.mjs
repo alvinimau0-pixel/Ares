@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import { runLegacyHandler } from "./_legacy-adapter.mjs";
+import { runLegacyHandler } from "../lib/legacy-adapter.mjs";
 const require = createRequire(import.meta.url);
 const handler = require("../../api/health.js");
 export default (request) => runLegacyHandler(handler, request);
