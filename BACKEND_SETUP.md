@@ -48,3 +48,48 @@ The migration enables RLS and scopes authenticated-user access by `auth.uid()`. 
 - Voice-token route is ready, but the ElevenLabs widget must be switched to signed-session startup before enabling mandatory agent auth.
 - Memory routes are ready after a dedicated Supabase project and owner are provisioned.
 - n8n execution and Obsidian access are intentionally not proxied until their private endpoints and credentials are configured.
+
+
+## Netlify migration (separate deployment)
+
+The `netlify-migration` branch adds a compatibility layer for the existing Vercel Node handlers. It keeps the original `api/` and `lib/` source modules in place and exposes matching Netlify Functions at the same `/api/*` paths. The static frontend remains at the repository root; no frontend redesign is part of this migration.
+
+### Netlify build settings
+
+- Base directory: repository root
+- Publish directory: `.`
+- Functions directory: `netlify/functions`
+- Build command: leave blank (the frontend has no build step)
+
+The `netlify.toml` file supplies these settings. Do not configure a Vercel build command on Netlify.
+
+### Required Netlify function environment variables
+
+Set these in the Netlify site's environment-variable settings and include the **Functions** scope. Do not put values in GitHub, source files, or chat.
+
+| Variable | Required for |
+|---|---|
+| `ARES_ADMIN_PASSWORD` | Ares owner sign-in |
+| `ARES_SESSION_SECRET` | Signed sessions; use a random value of at least 32 characters |
+| `AI_GATEWAY_API_KEY` | AI Gateway authentication on Netlify (Vercel OIDC is not available here) |
+| `AI_GATEWAY_MODEL` | Exact provider/model ID used as the default |
+| `ELEVENLABS_API_KEY` | Voice signed-session endpoint |
+| `ELEVENLABS_AGENT_ID` | Existing Ares ElevenLabs agent |
+
+Optional memory variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `ARES_OWNER_ID`. Only configure these after provisioning a dedicated Ares Supabase project; do not reuse **TheCapitol**. n8n and Obsidian variables remain optional and their adapters are not implemented.
+
+After setting or changing variables, create a new deploy so the functions receive the updated values. The health endpoint reports whether variables are configured, not whether upstream services are healthy.
+
+### Validation and rollout
+
+1. Keep the existing Vercel production deployment as the rollback target.
+2. Deploy this branch to the Netlify site as a Deploy Preview or branch deploy first.
+3. Verify `GET /api/health`, unauthenticated `GET /api/auth/session`, login/logout, then authenticated `GET /api/models`, `POST /api/chat`, and the voice-token route.
+4. Verify cookies are HttpOnly, Secure and SameSite=Strict; verify invalid origins and unauthenticated integration calls are rejected.
+5. Only after successful tests should the Netlify production branch be selected.
+
+The current origin allowlist includes the primary Netlify site URL `https://ares-intelligence.netlify.app` and the existing Vercel URLs. Netlify deploy-preview hostnames are intentionally not trusted by default. Add a specific preview origin only if preview testing requires it and the origin is known.
+
+### Migration limitations
+
+This is a compatibility adapter, not yet a verified production deployment. The connector workflow has not executed a Netlify build or function invocation. Runtime compatibility, cookie behavior, deploy-preview routing, and all upstream integrations must be tested on a real Netlify deploy before switching traffic.
