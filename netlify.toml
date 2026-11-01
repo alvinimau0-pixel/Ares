@@ -1,0 +1,10 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = []
+
+# API paths are declared by each function's config.path.
+# Keep the existing Vercel deployment configuration untouched.
