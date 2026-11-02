@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b16"><title>ARES — Local Control Room</title>
+<style>
+:root{color-scheme:dark;--bg:#070b16;--panel:#101a2b;--line:#91a9cf30;--muted:#9aabc5;--text:#f2f6ff;--teal:#6be0d4;--violet:#a78bfa;--green:#67e8b4;--red:#ff9caa;--amber:#f5ce83}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 52% 0%,#172a43 0,#0a1424 42%,#050914 82%);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,select,textarea{font:inherit;color:inherit}button{cursor:pointer}.shell{max-width:1440px;margin:auto;padding:24px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;min-height:100vh}
+aside{border:1px solid var(--line);border-radius:18px;background:#091426c9;padding:20px;display:flex;flex-direction:column;gap:22px}.brand{display:flex;gap:12px;align-items:center}.mark{width:38px;height:38px;border:2px solid var(--teal);border-radius:50%;box-shadow:0 0 18px #6be0d455;position:relative}.mark:after{content:"";position:absolute;inset:6px;border:1px solid var(--violet);border-radius:50%;transform:rotate(40deg) scaleX(.6)}.brand b{letter-spacing:.24em;font-size:17px;font-weight:600}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.08em}
+nav{display:grid;gap:7px}nav a{color:#c4d3e8;text-decoration:none;padding:10px 12px;border:1px solid transparent;border-radius:10px;font-size:12px}nav a.active{background:#183d48;border-color:#6be0d444;color:white}nav a span{display:inline-block;width:24px;color:var(--teal)}
+.aside-note{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:10px}.local-tag{display:inline-block;border:1px solid #67e8b477;color:var(--green);border-radius:20px;padding:4px 9px;font-size:10px}
+main{min-width:0;display:flex;flex-direction:column;gap:18px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.top h1{margin:0;font-size:25px;font-weight:550;letter-spacing:-.03em}.top p{margin:3px 0 0;color:var(--muted);font-size:11px}.top-actions{display:flex;align-items:center;gap:8px}
+.btn{border:1px solid #6be0d455;background:#173b46;border-radius:18px;padding:8px 13px;font-size:11px}.btn.primary{background:linear-gradient(120deg,#398f91,#7862c9);border:0;color:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.tile,.panel{border:1px solid var(--line);border-radius:15px;background:linear-gradient(150deg,#111f35e8,#0b1629e8);box-shadow:0 12px 30px #0003}.tile{padding:15px;min-width:0}.tile-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.tile h2{font-size:11px;letter-spacing:.1em;margin:0;color:#c4d5ed}.dot{width:8px;height:8px;border-radius:50%;background:#7e8ba1;box-shadow:0 0 10px currentColor}.dot.good{background:var(--green);color:var(--green)}.dot.warn{background:var(--amber);color:var(--amber)}.dot.bad{background:var(--red);color:var(--red)}.tile strong{display:block;font-size:16px;margin:12px 0 3px;font-weight:550}.tile p{margin:0;color:var(--muted);font-size:10px;overflow-wrap:anywhere}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.85fr);gap:14px;min-height:0}.panel{padding:17px;min-width:0}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.panel-head h2{font-size:13px;margin:0;font-weight:550}.panel-head small{color:var(--muted);font-size:10px}
+.chat{display:flex;flex-direction:column;min-height:470px}.chatlog{flex:1;min-height:300px;max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:3px 2px 14px}.bubble{max-width:88%;padding:11px 13px;border:1px solid var(--line);border-radius:13px;background:#13243a;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.bubble.user{align-self:flex-end;background:#173c47;border-color:#6be0d455}.bubble.assistant{align-self:flex-start}.bubble.notice{max-width:none;color:#c4d3e8;background:#171c31}.composer{display:grid;grid-template-columns:160px minmax(0,1fr) auto;gap:8px;align-items:end;border:1px solid #6be0d477;border-radius:14px;padding:8px;background:#091629}.composer select,.composer textarea{background:#071321;border:1px solid var(--line);border-radius:9px;padding:9px;font-size:11px;min-width:0}.composer textarea{resize:vertical;min-height:42px;max-height:130px}.status{font-size:10px;color:var(--muted);min-height:17px;margin-top:8px}.status.error{color:var(--red)}.status.ok{color:var(--green)}
+.stack{display:grid;gap:12px;align-content:start}.info-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:11px}.info-row:last-child{border:0}.info-row span:last-child{color:var(--muted);text-align:right}.callout{padding:12px;border:1px solid #6be0d433;background:#0b2030;border-radius:11px;color:#c6d7eb;font-size:10px;line-height:1.6}.foot{color:#7589a8;font-size:10px;text-align:center;padding:5px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.stack{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.shell{display:flex;flex-direction:column;padding:12px;gap:12px}aside{padding:12px;gap:12px}.brand{margin-bottom:2px}nav{display:flex;overflow:auto}nav a{white-space:nowrap;padding:8px 10px}.aside-note{display:none}.top{align-items:flex-start}.top h1{font-size:21px}.top-actions{flex-direction:column;align-items:flex-end}.grid{gap:8px}.tile{padding:11px}.tile strong{font-size:14px}.panel{padding:13px}.chat{min-height:520px}.chatlog{max-height:none;min-height:340px}.composer{grid-template-columns:1fr auto}.composer select{grid-column:1/-1}.stack{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style></head>
+<body><div class="shell">
+<aside><div class="brand"><div class="mark"></div><div><b>ARES</b><small>LOCAL COMMAND CENTRE</small></div></div>
+<nav aria-label="Main navigation"><a class="active" href="#overview"><span>⌂</span>Overview</a><a href="#chat"><span>◈</span>Chat</a><a href="#brains"><span>◎</span>Brains & Engine</a><a href="#runtime"><span>◇</span>Runtime</a></nav>
+<div class="aside-note"><span class="local-tag">LOCAL ONLY</span><p>Bound to this PC. No cloud deployment or remote access is enabled by this control room.</p></div></aside>
+<main>
+<header class="top" id="overview"><div><h1>Control Room</h1><p>Hermes execution engine · Independent reasoning brains · Structured routing</p></div><div class="top-actions"><span class="local-tag">127.0.0.1</span><button class="btn" id="refresh">↻ Refresh status</button></div></header>
+<section class="grid" id="brains" aria-label="Runtime status">
+<article class="tile"><div class="tile-head"><h2>HERMES ENGINE</h2><i class="dot" id="hermesDot"></i></div><strong id="hermesState">Checking…</strong><p id="hermesDetail">Local bridge status</p></article>
+<article class="tile"><div class="tile-head"><h2>BRAIN A · CLAUDE</h2><i class="dot" id="claudeDot"></i></div><strong id="claudeState">Checking…</strong><p id="claudeDetail">Independent provider configuration</p></article>
+<article class="tile"><div class="tile-head"><h2>BRAIN B · CHATGPT</h2><i class="dot" id="chatgptDot"></i></div><strong id="chatgptState">Checking…</strong><p id="chatgptDetail">Independent provider configuration</p></article>
+<article class="tile"><div class="tile-head"><h2>JEV · TYPESAFE</h2><i class="dot" id="jevDot"></i></div><strong id="jevState">Checking…</strong><p id="jevDetail">Optional structured decision layer</p></article>
+</section>
+<section class="layout" id="chat">
+<article class="panel chat"><div class="panel-head"><h2>ARES Conversation</h2><small id="messageCount">0 messages</small></div>
+<div class="chatlog" id="chatlog" role="log" aria-live="polite"><div class="bubble assistant">Local control room ready. Select a configured brain and send a message to verify its upstream connection.</div></div>
+<form class="composer" id="composer"><select id="brain" aria-label="Select reasoning brain"><option value="claude">Brain A · Claude</option><option value="chatgpt">Brain B · ChatGPT</option></select><textarea id="message" maxlength="12000" required placeholder="Give ARES a task…"></textarea><button class="btn primary" id="send" type="submit">Send ↗</button></form>
+<div class="status" id="chatStatus" role="status">Messages remain in this page session only.</div></article>
+<div class="stack" id="runtime">
+<article class="panel"><div class="panel-head"><h2>Runtime configuration</h2><small>Read-only</small></div>
+<div class="info-row"><span>Local bridge</span><span id="bridgeValue">Checking…</span></div><div class="info-row"><span>Hermes API key</span><span id="keyValue">Checking…</span></div><div class="info-row"><span>Brain A model</span><span id="modelAValue">—</span></div><div class="info-row"><span>Brain B model</span><span id="modelBValue">—</span></div><div class="info-row"><span>JEV key</span><span id="jevKeyValue">—</span></div></article>
+<article class="panel"><div class="panel-head"><h2>Operating boundaries</h2></div><div class="callout">Hermes is the execution engine. Claude and ChatGPT are separate selectable brains; no automatic fallback occurs. JEV is optional and does not replace either brain. This page does not collect API keys or save chat history.</div><p class="status" id="healthStatus">Waiting for local runtime…</p></article>
+</div></section>
+<div class="foot">ARES local runtime · No cloud API routes · No brain-specific visual interface</div>
+</main></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),history=[];let busy=false,health=null;
+function dot(id,state){$(id).className='dot '+state}
+function setText(id,value){$(id).textContent=value??'—'}
+async function refreshHealth(){
+ const button=$('refresh');button.disabled=true;setText('healthStatus','Checking local runtime…');
+ try{
+  const response=await fetch('/local-api/health',{headers:{Accept:'application/json'},cache:'no-store'}),data=await response.json();
+  if(!response.ok)throw new Error(data.error||'Local health check failed');
+  health=data;setText('hermesState','Bridge online');setText('hermesDetail','Local ARES API is responding');dot('hermesDot','good');
+  setText('bridgeValue','Online');setText('keyValue',data.engine?.keyConfigured?'Configured':'Missing');
+  const a=data.brains?.claude||{},b=data.brains?.chatgpt||{};
+  setText('claudeState',a.configured?'Configured':'Not configured');setText('claudeDetail',(a.provider||'anthropic')+' · '+(a.model||'Model not set'));dot('claudeDot',a.configured?'good':'warn');
+  setText('chatgptState',b.configured?'Configured':'Not configured');setText('chatgptDetail',(b.provider||'openai')+' · '+(b.model||'Model not set'));dot('chatgptDot',b.configured?'good':'warn');
+  setText('jevState',data.jev?.keyConfigured?'Key configured':'Not configured');setText('jevDetail',data.jev?.keyConfigured?'Hosted TypeSafe JEV available for request':'Optional; chat remains available');dot('jevDot',data.jev?.keyConfigured?'good':'warn');
+  setText('modelAValue',a.model||'Not set');setText('modelBValue',b.model||'Not set');setText('jevKeyValue',data.jev?.keyConfigured?'Configured':'Missing');
+  setText('healthStatus','Configuration loaded. Upstream connectivity is verified only when a chat request succeeds.');
+ }catch(error){
+  health=null;setText('hermesState','Unavailable');setText('hermesDetail',error.message);dot('hermesDot','bad');setText('bridgeValue','Offline');setText('healthStatus',error.message);
+  for(const id of ['claudeState','chatgptState','jevState'])setText(id,'Unknown');
+  for(const id of ['claudeDot','chatgptDot','jevDot'])dot(id,'bad');
+ }finally{button.disabled=false}
+}
+function render(){
+ const log=$('chatlog');log.replaceChildren();
+ if(!history.length){const empty=document.createElement('div');empty.className='bubble assistant';empty.textContent='Local control room ready. Select a configured brain and send a message to verify its upstream connection.';log.append(empty)}
+ for(const item of history){const bubble=document.createElement('div');bubble.className='bubble '+item.role;bubble.textContent=item.content;log.append(bubble)}
+ setText('messageCount',history.length+' messages');log.scrollTop=log.scrollHeight;
+}
+$('composer').addEventListener('submit',async event=>{
+ event.preventDefault();const input=$('message'),brain=$('brain').value,content=input.value.trim();if(!content||busy)return;
+ if(!health){setText('chatStatus','Local runtime is not reachable. Refresh status and try again.');$('chatStatus').className='status error';return}
+ const brainConfig=health.brains?.[brain];if(!brainConfig?.configured){setText('chatStatus','The selected brain is not configured. Configure its provider/model in Hermes and restart ARES.');$('chatStatus').className='status error';return}
+ history.push({role:'user',content});render();input.value='';busy=true;$('send').disabled=true;setText('chatStatus','Sending to '+(brain==='claude'?'Brain A · Claude':'Brain B · ChatGPT')+' through Hermes…');
+ try{
+  const response=await fetch('/local-api/chat',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({brain,messages:history.slice(-30)})});
+  const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Local chat request failed');
+  if(typeof data.reply!=='string'||!data.reply.trim())throw new Error('Hermes returned an empty reply');
+  history.push({role:'assistant',content:data.reply});render();setText('chatStatus','Verified response · '+data.provider+' / '+data.model+(data.usage?.total_tokens?' · '+data.usage.total_tokens+' tokens':''));$('chatStatus').className='status ok';
+ }catch(error){history.pop();render();setText('chatStatus',error.message);$('chatStatus').className='status error'}
+ finally{busy=false;$('send').disabled=false;input.focus()}
+});
+$('refresh').addEventListener('click',refreshHealth);
+$('brain').addEventListener('change',()=>{const selected=$('brain').value;setText('chatStatus','Explicit route selected: '+(selected==='claude'?'Brain A · Claude':'Brain B · ChatGPT'));$('chatStatus').className='status'});
+refreshHealth();
+})();
+</script></body></html>
