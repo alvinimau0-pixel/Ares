@@ -6,6 +6,6 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "start:local": "node local/server.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test"
   }
 }
