@@ -32,3 +32,13 @@ test("does not silently route to another brain when one is unconfigured", () => 
   assert.match(validateChatBody({ brain: "claude", messages: [{ role: "user", content: "hi" }] }, config), /not configured/);
   assert.equal(validateChatBody({ brain: "chatgpt", messages: [{ role: "user", content: "hi" }] }, config), "");
 });
+
+test("rejects combined message content above 24,000 characters", () => {
+  const config = readConfig({ BRAIN_A_MODEL: "claude-model" });
+  const messages = [
+    { role: "user", content: "x".repeat(9000) },
+    { role: "assistant", content: "y".repeat(9000) },
+    { role: "user", content: "z".repeat(9000) }
+  ];
+  assert.match(validateChatBody({ brain: "claude", messages }, config), /24,000/);
+});
