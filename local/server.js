@@ -51,7 +51,7 @@ const server = http.createServer(async (req, res) => {
       status: "online",
       engine: { name: "Hermes Agent", endpoint: config.hermesUrl, keyConfigured: Boolean(config.hermesApiKey) },
       brains: Object.fromEntries(Object.entries(config.brains).map(([id, brain]) => [id, { label: brain.label, provider: brain.provider, configured: brain.configured }])),
-      jev: { provider: "TypeSafe JEV", configured: config.jevConfigured }
+      jev: { provider: "TypeSafe JEV", keyConfigured: config.jevConfigured }
     });
   }
   if (req.method === "POST" && req.url === "/local-api/chat") {
