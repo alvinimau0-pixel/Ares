@@ -14,7 +14,9 @@ See [BACKEND_SETUP.md](BACKEND_SETUP.md) for deployment and environment setup.
 
 - `GET /api/health` — integration configuration readiness.
 - `POST /api/auth/login`, `GET /api/auth/session`, `POST /api/auth/logout` — secure owner session.
-- `POST /api/chat` — Vercel AI Gateway proxy.\n- `POST /api/agent-task` — authenticated single-specialist task execution.\n- `POST /api/orchestrate` — bounded ARES planning, sequential specialist delegation (up to three), and final synthesis.
+- `POST /api/chat` — Vercel AI Gateway proxy.
+- `POST /api/agent-task` — authenticated single-specialist task execution.
+- `POST /api/orchestrate` — bounded ARES planning, sequential specialist delegation (up to three), and final synthesis.
 - `POST /api/voice-token` — ElevenLabs signed session URL.
 - `GET|POST /api/memory` — Supabase-backed personal memory.
 - `supabase/migrations/` — RLS-protected Ares memory schema.
@@ -27,4 +29,8 @@ Provider keys remain server-side. API routes validate origins and require an Are
 
 ## Integration status
 The API foundation is committed. Live chat, voice, and persistent memory require the environment variables and dedicated Supabase project documented in [BACKEND_SETUP.md](BACKEND_SETUP.md). The existing Supabase project named **TheCapitol** is deliberately not reused.
-\n\n## ARES orchestration limits\n\nThe AI Workforce panel supports both manual specialist assignments and an ARES mission flow. Orchestration plans with a fixed role allowlist, runs up to three specialist calls sequentially, and synthesizes successful findings. This is AI reasoning and drafting only: it does not run shell commands, modify files, call connected accounts, or execute external workflows. Results are session-only in the browser. Owner authentication and AI Gateway configuration are required.\n
+
+
+## ARES orchestration limits
+
+The AI Workforce panel supports both manual specialist assignments and an ARES mission flow. Orchestration plans with a fixed role allowlist, runs up to three specialist calls sequentially, and synthesizes successful findings. This is AI reasoning and drafting only: it does not run shell commands, modify files, call connected accounts, or execute external workflows. Results are session-only in the browser. Owner authentication and AI Gateway configuration are required.
