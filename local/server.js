@@ -19,23 +19,25 @@ function send(res, status, body) {
 }
 function readBody(req) {
   return new Promise((resolve, reject) => {
-    let data = "", size = 0;
+    let data = "", size = 0, rejected = false;
     req.on("data", chunk => {
+      if (rejected) return;
       size += chunk.length;
       if (size > config.maxBodyBytes) {
+        rejected = true;
         const error = new Error("Request body exceeds 32 KB.");
         error.statusCode = 413;
         reject(error);
-        req.destroy();
         return;
       }
       data += chunk.toString("utf8");
     });
     req.on("end", () => {
+      if (rejected) return;
       try { resolve(JSON.parse(data || "{}")); }
       catch { const error = new Error("Request body must be valid JSON."); error.statusCode = 400; reject(error); }
     });
-    req.on("error", reject);
+    req.on("error", error => { if (!rejected) reject(error); });
   });
 }
 const server = http.createServer(async (req, res) => {
