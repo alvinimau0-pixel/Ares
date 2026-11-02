@@ -118,4 +118,5 @@ module.exports = async function handler(req, res) {
     return send(res, 502, { error: error.message === "Invalid plan" || error.message === "No valid specialist assignments" ? "ARES could not produce a valid specialist plan. Please simplify the objective and retry." : error.message });
   }
 };
-\nmodule.exports.config = { maxDuration: 60 };\n
+
+module.exports.config = { maxDuration: 60 };
