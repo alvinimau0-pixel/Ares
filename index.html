@@ -213,7 +213,8 @@ function bindOrchestrator(){
   finally{button.disabled=false}
  };
 }
-\nfunction bindAgents(){
+
+function bindAgents(){
  renderAgentTasks();const form=$('#agentTaskForm');if(!form)return;
  form.onsubmit=async e=>{e.preventDefault();const task=$('#agentTaskInput').value.trim(),agent=$('#agentSelect').value,status=$('#agentStatus'),button=$('#assignAgentTask');if(!task)return;
  const item={id:Date.now(),agent,task,status:'Running',result:''};agentTaskHistory.push(item);renderAgentTasks();status.textContent='Sending task to specialist…';button.disabled=true;
