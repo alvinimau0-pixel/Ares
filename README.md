@@ -108,7 +108,7 @@ There is no automatic fallback between Brain A and Brain B. A missing model conf
 - `POST /local-api/jev/classify` — optional JEV structured brain selection.
 
 ### JEV
-Install the optional SDK with `npm install @typesafe-ai/sdk` and configure `TYPESAFE_API_KEY` in the local process environment to enable TypeSafe JEV. JEV is a separate structured decision service; it is not a third conversational brain. If unavailable, ARES reports that status and chat continues to work with explicit brain selection.
+Install the optional SDK with `npm install @typesafe-ai/sdk` and configure `TYPESAFE_API_KEY` in the local process environment to enable TypeSafe JEV. JEV is a separate structured decision service; it is not a third conversational brain and its inference is hosted by TypeSafe, not performed on the PC. The ARES bridge remains local, but a JEV decision requires internet access and a TypeSafe API key. If unavailable, ARES reports that status and chat continues to work with explicit brain selection.
 
 ### Security and current limits
 - The local service refuses non-loopback bind addresses and unexpected Host/Origin headers.
