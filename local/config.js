@@ -18,7 +18,9 @@ function readConfig(env = process.env) {
   if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error("ARES_LOCAL_PORT must be an integer from 1024 to 65535.");
   const hermesUrl = String(env.HERMES_API_URL || DEFAULTS.hermesUrl).replace(/\/$/, "");
   const parsed = new URL(hermesUrl);
-  if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("HERMES_API_URL must use HTTP or HTTPS.");
+  if (parsed.protocol !== "http:" || !["127.0.0.1", "localhost", "::1"].includes(parsed.hostname)) {
+    throw new Error("HERMES_API_URL must point to a local Hermes service on loopback.");
+  }
   const brains = {};
   for (const [id, base] of Object.entries(DEFAULTS.brains)) {
     const provider = String(env[base.envPrefix + "_PROVIDER"] || base.defaultProvider).trim();
