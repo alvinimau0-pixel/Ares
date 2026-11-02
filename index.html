@@ -57,6 +57,28 @@ button{transition:background .18s ease,border-color .18s ease,color .18s ease,tr
 @media(max-width:700px){.sidebar{position:sticky;top:0;z-index:10;background:#071020f5;padding:10px 4px 8px;backdrop-filter:blur(16px)}.nav{scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.center{height:610px;min-height:610px}.orbscene{width:min(310px,78vw);height:min(310px,78vw)}.floatcard{width:clamp(118px,39vw,145px)}.chatbar{bottom:12px}.workflow{height:270px}.canvas{grid-template-columns:100px minmax(0,1fr)}.flowarea{overflow-x:auto;justify-content:flex-start}.popup{left:10px;right:10px;width:auto}.wtop{overflow-x:auto;white-space:nowrap}.wtop .spacer{min-width:8px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
+
+/* ARES Phase 2 — conversational workspace */
+.chat-workspace{display:flex;flex-direction:column;gap:10px;min-height:300px}
+.chat-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chat-toolbar select{min-width:0;flex:1;background:#091426;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px;font-size:10px}
+.chat-toolbar button,.chat-send{border:1px solid var(--line);border-radius:18px;background:#173b46;color:var(--text);padding:7px 11px;font-size:10px}
+.chat-stream{display:flex;flex-direction:column;gap:10px;max-height:48vh;min-height:180px;overflow:auto;padding:4px 3px 10px;scrollbar-width:thin}
+.chat-message{max-width:92%;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:#101f34;color:var(--text);font-size:11px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-message.user{align-self:flex-end;background:#173c47;border-color:#6be0d455}
+.chat-message.assistant{align-self:flex-start}
+.chat-message.system{align-self:stretch;max-width:none;background:#171c31;color:#c6cce5}
+.chat-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin:0 2px}
+.chat-compose{display:flex;align-items:flex-end;gap:7px;border:1px solid #6be0d477;border-radius:15px;padding:7px;background:#091629}
+.chat-compose textarea{resize:vertical;min-height:38px;max-height:110px;flex:1;min-width:0;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:11px;padding:8px}
+.chat-compose button{border:0;border-radius:11px;background:linear-gradient(135deg,#6be0d4,#a78bfa);color:#071421;padding:10px 13px;font-weight:650}
+.chat-compose button:disabled{opacity:.45;cursor:not-allowed}
+.chat-hint{font-size:9px;color:var(--muted);line-height:1.5}
+.chat-status{font-size:10px;color:#c7d5e8;min-height:14px}
+.chat-status.error{color:#ffb4b4}
+.chat-status.ok{color:var(--green)}
+@media(max-width:700px){.chat-stream{max-height:52vh}.chat-workspace{min-height:260px}}
+
 </style></head>
 <body>
 <div class="app">
@@ -110,7 +132,7 @@ function toast(t){let x=$('#toast');x.textContent=t;x.classList.add('show');setT
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem('ares-config',JSON.stringify(cfg))}
 const views={
-chat:['Chat with Ares','<div class="card"><b>Private AI chat</b><p class="note">Your messages use the authenticated Ares backend.</p></div>'],
+chat:['Ares · AI Chat','<div class="chat-workspace"><div class="chat-toolbar"><select id="chatModel"><option value="">Use configured default model</option></select><button id="refreshChatModels" type="button">Models ↻</button><button id="clearChat" type="button">Clear</button></div><div class="chat-meta"><span id="chatSessionLabel">Temporary session · not saved</span><span id="chatCount">0 messages</span></div><div class="chat-stream" id="chatStream" aria-live="polite"><div class="chat-message assistant">Hello. I’m Ares. What would you like to work on?</div></div><div class="chat-status" id="chatStatus" role="status"></div><form class="chat-compose" id="chatComposer"><textarea id="chatMessageInput" rows="2" maxlength="12000" placeholder="Message Ares…" aria-label="Message Ares"></textarea><button id="chatSend" type="submit">Send</button></form><div class="chat-hint">Private owner session required. Conversation stays in this page session and is not saved to a database.</div></div>'],
 voice:['Chat / Voice','<div class="card"><b>ElevenLabs · Ares voice agent</b><p class="note">Secure session startup through the Ares backend. Sign in first.</p><button class="action" id="startAresVoice">Start voice session</button> <button class="action" id="endAresVoice">End session</button><p class="note" id="voiceStatus">Voice is offline.</p><div id="voiceTranscript" class="note"></div></div>'],
 ears:['Ears · Listening',`<div class="card"><b>Browser speech recognition</b><p id="transcript" class="note">Microphone is off. Start listening when ready.</p><button class="action" id="startListen">Start listening</button> <button class="action" id="stopListen">Stop</button></div>`],
 vision:['Eye · Vision',`<div class="card"><b>Local camera preview</b><video id="camera" autoplay playsinline muted style="width:100%;max-height:220px;background:#020712;border-radius:10px;margin:10px 0"></video><button class="action" id="startCamera">Enable camera</button> <button class="action" id="stopCamera">Stop camera</button><p class="note">Local preview only. Image understanding and secure frame transfer are not connected yet.</p></div>`],
@@ -125,6 +147,7 @@ plugins:['Plugins & MCP',`<div class="card"><b>Integration directory</b><p class
 files:['Files',`<div class="card"><b>Project files</b><p class="note">File indexing and Obsidian-backed search will appear here after the memory and storage services are connected.</p></div>`]
 };
 function openPanel(key){const v=views[key]||views.settings;popTitle.textContent=v[0];popBody.innerHTML=v[1];popup.classList.add('open');const on=(id,fn)=>{let e=$('#'+id);if(e)e.onclick=fn};
+if(key==='chat')bindChat();
 if(key==='auth'){fetch('/api/auth/session').then(r=>r.json()).then(d=>{if($('#authStatus'))$('#authStatus').textContent=d.authenticated?'Signed in.':'Not signed in.'}).catch(()=>{if($('#authStatus'))$('#authStatus').textContent='Backend not reachable.'});on('aresLogin',async()=>{const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#aresPassword').value})});const d=await r.json();$('#authStatus').textContent=r.ok?'Signed in successfully.':(d.error||'Sign-in failed.');if(r.ok){$('#aresPassword').value='';toast('Ares session started')}});on('aresLogout',async()=>{await fetch('/api/auth/logout',{method:'POST'});$('#authStatus').textContent='Signed out.';toast('Ares session ended')})}
 if(key==='voice'){on('startAresVoice',async()=>{try{const r=await fetch('/api/voice-token',{method:'POST'});const d=await r.json();if(!r.ok)throw new Error(d.error||'Voice unavailable');const {Conversation}=await import('https://esm.sh/@elevenlabs/client');window.aresConversation=await Conversation.startSession({signedUrl:d.signedUrl,onMessage:m=>{const el=$('#voiceTranscript');if(el&&m.message)el.textContent+='\\n'+m.message},onError:e=>toast('Voice error: '+(e.message||'connection failed'))});$('#voiceStatus').textContent='Connected to Ares voice.';orb.classList.add('listening')}catch(e){$('#voiceStatus').textContent=e.message;toast(e.message)}});on('endAresVoice',async()=>{try{await window.aresConversation?.endSession()}catch{}window.aresConversation=null;orb.classList.remove('listening');$('#voiceStatus').textContent='Voice is offline.'})}
 if(key==='ears'){on('startListen',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Speech recognition is not supported in this browser');return}recognition=new SR();recognition.continuous=true;recognition.lang='en-US';recognition.onresult=e=>$('#transcript').textContent=Array.from(e.results).map(x=>x[0].transcript).join(' ');recognition.onerror=e=>toast(e.error);recognition.start();orb.classList.add('listening');toast('Listening started')});on('stopListen',()=>{recognition?.stop();orb.classList.remove('listening');toast('Listening stopped')})}
@@ -145,7 +168,58 @@ document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',(
 document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>window.open(b.dataset.action==='github'?'https://github.com/alvinimau0-pixel/Ares':'https://ares-intelligence.vercel.app','_blank','noopener'));
 $('#closePop').onclick=()=>popup.classList.remove('open');
 $('#orb').onclick=()=>{orb.classList.toggle('listening');setTimeout(()=>orb.classList.remove('listening'),1600);toast('Jarvis core activated')};
-const chatHistory=[];$('#chatForm').onsubmit=async e=>{e.preventDefault();const q=$('#chatInput').value.trim();if(!q)return;$('#chatInput').value='';openPanel('chat');popTitle.textContent='Chat with Ares';popBody.innerHTML='<div class="card"><div class="note" id="chatReply">Ares is thinking…</div></div><button class="action" id="signInChat">Sign in</button>';const target=$('#chatReply');try{chatHistory.push({role:'user',content:q});const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory.slice(-20),model:cfg.aiModel||undefined})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Chat request failed');chatHistory.push({role:'assistant',content:d.reply});target.textContent=d.reply||'No response received.'}catch(err){target.textContent=err.message;const b=$('#signInChat');if(b)b.onclick=()=>openPanel('auth')}};
+
+const chatHistory=[];let chatBusy=false;
+function chatStatus(message,type=''){const el=$('#chatStatus');if(el){el.textContent=message;el.className='chat-status '+type}}
+function renderChat(){
+ const stream=$('#chatStream');if(!stream)return;
+ stream.innerHTML='';
+ if(!chatHistory.length){const welcome=document.createElement('div');welcome.className='chat-message assistant';welcome.textContent='Hello. I’m Ares. What would you like to work on?';stream.append(welcome)}
+ chatHistory.forEach(m=>{const bubble=document.createElement('div');bubble.className='chat-message '+m.role;bubble.textContent=m.content;stream.append(bubble)});
+ const count=$('#chatCount');if(count)count.textContent=chatHistory.length+' messages';
+ stream.scrollTop=stream.scrollHeight;
+}
+async function loadChatModels(){
+ const select=$('#chatModel');if(!select)return;
+ select.innerHTML='<option value="">Use configured default model</option>';
+ try{
+  const r=await fetch('/api/models');const d=await r.json();
+  if(!r.ok)throw new Error(d.error||'Model catalogue unavailable');
+  d.models.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=(m.name||m.id)+' · '+m.id;select.append(o)});
+  const selected=cfg.aiModel||d.configuredDefault||'';if(selected)select.value=selected;
+  chatStatus(d.count+' models available.','ok');
+ }catch(e){chatStatus(e.message,'error')}
+}
+async function sendChatMessage(raw){
+ const q=String(raw||'').trim();if(!q||chatBusy)return;
+ const composer=$('#chatComposer'),input=$('#chatMessageInput'),send=$('#chatSend');
+ chatHistory.push({role:'user',content:q});renderChat();if(input)input.value='';
+ chatBusy=true;if(send)send.disabled=true;chatStatus('Ares is thinking…');
+ const model=$('#chatModel')?.value||cfg.aiModel||undefined;
+ try{
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory.slice(-20),model})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok){const error=new Error(d.error||'Chat request failed.');error.status=r.status;throw error}
+  if(typeof d.reply!=='string'||!d.reply.trim())throw new Error('Ares returned an empty response.');
+  chatHistory.push({role:'assistant',content:d.reply});renderChat();
+  chatStatus((d.model?'Model: '+d.model:'Response received')+(d.usage?.total_tokens?' · '+d.usage.total_tokens+' tokens':''),'ok');
+ }catch(e){
+  chatHistory.pop();renderChat();chatStatus(e.message,'error');
+  if(e.status===401||e.status===403){
+   const old=$('#chatSignIn');if(old)old.remove();
+   const sign=document.createElement('button');sign.id='chatSignIn';sign.className='action';sign.type='button';sign.textContent='Sign in to Ares';sign.onclick=()=>openPanel('auth');$('#chatStatus')?.after(sign);
+  }else if(e.status===503){chatStatus('AI Gateway is not configured. '+e.message,'error')}
+ }finally{chatBusy=false;if(send)send.disabled=false;input?.focus()}
+}
+function bindChat(){
+ renderChat();loadChatModels();
+ const form=$('#chatComposer');if(form)form.onsubmit=e=>{e.preventDefault();sendChatMessage($('#chatMessageInput')?.value)};
+ const clear=$('#clearChat');if(clear)clear.onclick=()=>{if(chatBusy)return;chatHistory.length=0;renderChat();chatStatus('This temporary conversation was cleared.')};
+ const refresh=$('#refreshChatModels');if(refresh)refresh.onclick=loadChatModels;
+ const model=$('#chatModel');if(model)model.onchange=()=>{cfg.aiModel=model.value;save();chatStatus(model.value?'Model selected for this browser.':'Using configured default model.','ok')};
+}
+
+$('#chatForm').onsubmit=async e=>{e.preventDefault();const q=$('#chatInput').value.trim();if(!q)return;$('#chatInput').value='';openPanel('chat');bindChat();sendChatMessage(q)};
 $('#micButton').onclick=()=>openPanel('ears');
 document.querySelector('.profile').onclick=()=>openPanel('auth');
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');toast(b.dataset.tab+' workspace selected')});
