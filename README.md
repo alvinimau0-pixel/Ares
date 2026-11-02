@@ -117,3 +117,25 @@ Install the optional SDK with `npm install @typesafe-ai/sdk` and configure `TYPE
 - No automatic brain fallback, provider OAuth, software installation, shell execution from ARES, remote exposure or credential persistence is performed by the setup scripts.
 - This phase provides the local API/runtime foundation only. The orb and galaxy interfaces are on hold as requested.
 - The old cloud API routes remain in the repository for backward compatibility but are not the local execution engine.
+
+
+## Phase 8 — Local Control Room
+
+The local runtime now serves the ARES control room at **http://127.0.0.1:8787/**. Start it after configuring and starting Hermes:
+
+```bash
+npm run start:local
+```
+
+The page is served by the local Node process and uses same-origin local endpoints only. It provides:
+- Hermes local bridge status and whether its API key is configured.
+- Independent Brain A (Claude) and Brain B (ChatGPT/OpenAI) provider/model readiness.
+- Optional TypeSafe JEV key readiness.
+- A generic chat composer with an explicit brain selector; no automatic fallback between brains.
+- Session-only chat history that is cleared when the page is reloaded.
+
+**Status meanings:** “Bridge online” means the local ARES HTTP service answered its health request; it does not prove Hermes itself is reachable. “Configured” means a model ID is present in the local environment; it does not prove provider authentication or model availability. An upstream connection is verified only after a successful chat response. JEV “Key configured” indicates local key presence only, not a successful JEV request.
+
+The local control room does not load the legacy cloud frontend, call cloud `/api/*` endpoints, collect credentials, or store chat in browser storage. The server serves only the fixed `local/public/index.html` page at `/`; unknown paths remain 404. Responses include restrictive same-origin and browser security headers. The service remains loopback-only.
+
+The legacy cloud dashboard and APIs remain in the repository for backward compatibility; they are not part of the local control room. Brain-specific orb/galaxy interfaces remain deferred.
