@@ -64,3 +64,56 @@ The Plugins & MCP workspace is now the ARES Connector Registry.
 - POST /api/permission-check evaluates a policy only. Its response always states executed: false.
 
 All endpoints require the existing ARES owner session and allowed origin. GitHub tokens must be stored as server-side environment variables and must never be placed in frontend code, local storage, or chat messages. This phase does not connect arbitrary MCP servers, run shell commands, or change repository contents.
+
+## Phase 7 — Local Hermes runtime
+
+ARES is moving to a local-first execution architecture. The local runtime is a Node.js 20+ service that binds to loopback only at `127.0.0.1:8787`. It keeps the Hermes API key on the PC and forwards requests to the Hermes Agent API server at `127.0.0.1:8642`.
+
+### Roles
+- **Engine:** Hermes Agent owns tool execution, skills, memory and agent orchestration.
+- **Brain A:** Claude provider/model, configured independently with `BRAIN_A_PROVIDER` and `BRAIN_A_MODEL`.
+- **Brain B:** ChatGPT/OpenAI provider/model, configured independently with `BRAIN_B_PROVIDER` and `BRAIN_B_MODEL`.
+- **JEV:** Optional TypeSafe structured classifier, enabled only when `TYPESAFE_API_KEY` and the optional `@typesafe-ai/sdk` package are available.
+- **Brain interfaces:** Claude's orb and ChatGPT's galaxy are intentionally deferred; this phase does not implement either visual interface.
+
+There is no automatic fallback between Brain A and Brain B. A missing model configuration makes only that brain unavailable.
+
+### PC setup
+
+1. Install Node.js 20+ and Hermes Agent using the official Hermes Desktop installer (Windows/macOS) or official platform instructions.
+2. Configure Claude and ChatGPT/OpenAI providers in Hermes with `hermes model`. Use the provider and model IDs that Hermes lists for the accounts you actually have.
+3. Enable Hermes' local API server in `~/.hermes/.env`:
+   ```dotenv
+   API_SERVER_ENABLED=true
+   API_SERVER_HOST=127.0.0.1
+   API_SERVER_PORT=8642
+   API_SERVER_KEY=replace-with-a-long-random-local-secret
+   ```
+4. Start Hermes with `hermes gateway`. Confirm it listens on `http://127.0.0.1:8642`.
+5. Set local environment variables in the same terminal before starting ARES:
+   ```powershell
+   $env:HERMES_API_KEY="same-secret-as-API_SERVER_KEY"
+   $env:BRAIN_A_PROVIDER="anthropic"
+   $env:BRAIN_A_MODEL="your-configured-claude-model"
+   $env:BRAIN_B_PROVIDER="openai"
+   $env:BRAIN_B_MODEL="your-configured-openai-model"
+   npm run start:local
+   ```
+   On macOS/Linux, use `export NAME=value` for each variable.
+6. Check `http://127.0.0.1:8787/local-api/health`.
+
+### Local endpoints
+- `GET /local-api/health` — readiness metadata; never returns secrets.
+- `POST /local-api/chat` — body: `{ "brain": "claude" | "chatgpt", "messages": [...] }`.
+- `POST /local-api/jev/classify` — optional JEV structured brain selection.
+
+### JEV
+Install the optional SDK with `npm install @typesafe-ai/sdk` and configure `TYPESAFE_API_KEY` in the local process environment to enable TypeSafe JEV. JEV is a separate structured decision service; it is not a third conversational brain. If unavailable, ARES reports that status and chat continues to work with explicit brain selection.
+
+### Security and current limits
+- The local service refuses non-loopback bind addresses and unexpected Host/Origin headers.
+- The Hermes key is never sent to browser code or included in API responses.
+- Chat requests are size-limited, role-validated and restricted to the two configured brains.
+- No automatic brain fallback, provider OAuth, software installation, shell execution from ARES, remote exposure or credential persistence is performed by the setup scripts.
+- This phase provides the local API/runtime foundation only. The orb and galaxy interfaces are on hold as requested.
+- The old cloud API routes remain in the repository for backward compatibility but are not the local execution engine.
