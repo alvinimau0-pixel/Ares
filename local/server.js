@@ -6,6 +6,8 @@ const { chatWithHermes } = require("./hermes-client");
 const { classifyWithJev } = require("./jev");
 
 const PUBLIC_INDEX = path.join(__dirname, "public", "index.html");
+let jevSdkAvailable = false;
+try { require.resolve("@typesafe-ai/sdk"); jevSdkAvailable = true; } catch {}
 const SECURITY_HEADERS = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
@@ -64,7 +66,7 @@ function createServer(config = readConfig()) {
         status: "online",
         engine: { name: "Hermes Agent", endpoint: config.hermesUrl, keyConfigured: Boolean(config.hermesApiKey) },
         brains: Object.fromEntries(Object.entries(config.brains).map(([id, brain]) => [id, { label: brain.label, provider: brain.provider, model: brain.model || "", configured: brain.configured }])),
-        jev: { provider: "TypeSafe JEV", keyConfigured: config.jevConfigured }
+        jev: { provider: "TypeSafe JEV", keyConfigured: config.jevConfigured, sdkAvailable: jevSdkAvailable, configured: config.jevConfigured && jevSdkAvailable }
       });
     }
     if (req.method === "POST" && req.url === "/local-api/chat") {
