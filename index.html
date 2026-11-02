@@ -104,6 +104,17 @@ button{transition:background .18s ease,border-color .18s ease,color .18s ease,tr
 .agent-task-result{white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px;line-height:1.6;color:#d6e5f7;margin-top:8px}
 .agent-empty{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:10px;text-align:center}
 .agent-status{font-size:10px;min-height:15px;color:var(--muted);margin-top:8px}
+
+.skill-workspace{display:grid;gap:12px}
+.skill-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.skill-tile{border:1px solid var(--line);border-radius:10px;padding:10px;background:#0d1a2d;min-width:0}
+.skill-tile b{font-size:10px}.skill-tile small{display:block;color:#9fe9df;font-size:9px;margin:4px 0}.skill-tile p{font-size:9px;color:var(--muted);line-height:1.5;margin:0}
+.skill-runner{border:1px solid #31506b;border-radius:12px;padding:13px;background:#0c1d31}
+.skill-runner label{display:block;font-size:10px;color:var(--muted);margin:9px 0 5px}
+.skill-runner select,.skill-runner textarea{width:100%;background:#071323;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px;font:inherit;font-size:11px}
+.skill-runner textarea{min-height:90px;resize:vertical}
+.skill-result{border:1px solid var(--line);border-radius:10px;padding:12px;background:#0a1729;white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px;line-height:1.6;color:#d6e5f7}
+@media(max-width:700px){.skill-catalog{grid-template-columns:1fr}}
 .orchestrator{border:1px solid #31506b;border-radius:13px;padding:13px;background:linear-gradient(145deg,#10243a,#101b31);margin:12px 0}
 .orchestrator h3{font-size:12px;margin:0 0 5px}.orchestrator p{font-size:10px;color:var(--muted);line-height:1.5}
 .orchestrator textarea{width:100%;min-height:90px;resize:vertical;background:#071323;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:10px;font:inherit;font-size:11px}
@@ -179,7 +190,7 @@ agents:['AI Workforce',`<div class="workforce"><div class="workforce-intro"><str
 workflows:['Workflow Studio',`<div class="card"><b>Visual workflow editor</b><p class="note">The canvas shows the starter orchestration: Trigger → Jarvis Agent → GitHub → Vercel → Notify.</p><p class="note">Live workflow editing and execution require a connected n8n API and server-side credentials.</p><button class="action" id="openN8n">Open n8n</button></div>`],
 github:['GitHub Repository',`<div class="card"><b>alvinimau0-pixel / Ares</b><p class="note">Source repository for this Jarvis interface.</p><button class="action" id="openGit">Open repository</button></div>`],
 vercel:['Vercel Deployment',`<div class="card"><b>ares-intelligence</b><p class="note">Production deployment on Vercel.</p><button class="action" id="openDeploy">Open production site</button></div>`],
-skills:['Skills Library',`<div class="card"><b>Task skill registry</b><p class="note">Connect skill sources and orchestrate specialist capabilities from the AI gateway. Skill discovery and execution backend is the next phase.</p></div>`],
+skills:['Skills Library',`<div class="skill-workspace"><div class="workforce-intro"><strong>ARES Capability Registry</strong><p>Discover approved built-in skills and run them through a bounded, authenticated capability layer. AI skills draft and analyse; local calculator runs deterministic arithmetic.</p></div><div class="skill-catalog" id="skillCatalog"><div class="agent-empty">Loading approved skills…</div></div><form class="skill-runner" id="skillRunForm"><b style="font-size:11px">Run a skill</b><label for="skillSelect">Capability</label><select id="skillSelect"></select><label for="skillInput" id="skillInputLabel">Input</label><textarea id="skillInput" maxlength="8000" required placeholder="Describe what you need…"></textarea><button class="action" id="runSkillButton" type="submit">Run skill ↗</button><div class="agent-status" id="skillStatus" role="status"></div></form><div id="skillResult" class="skill-result" hidden></div><p class="note">External tools, shell commands, file changes and account actions are not enabled. Those require separate approved connectors and execution policies.</p></div>`],
 plugins:['Plugins & MCP',`<div class="card"><b>Integration directory</b><p class="note">GitHub and Vercel are connected to this project workflow. Additional MCP servers require secure backend configuration.</p></div>`],
 files:['Files',`<div class="card"><b>Project files</b><p class="note">File indexing and Obsidian-backed search will appear here after the memory and storage services are connected.</p></div>`]
 };
@@ -190,6 +201,35 @@ function renderAgentTasks(){
  const host=$('#agentTasks');if(!host)return;host.innerHTML='';
  if(!agentTaskHistory.length){host.innerHTML='<div class="agent-empty">No tasks assigned in this session yet.</div>';return}
  [...agentTaskHistory].reverse().forEach(t=>{const card=document.createElement('div');card.className='agent-task';const top=document.createElement('div');top.className='agent-task-top';const name=document.createElement('b');name.textContent=agentNames[t.agent]||t.agent;const state=document.createElement('small');state.textContent=t.status;top.append(name,state);const brief=document.createElement('div');brief.className='agent-task-result';brief.textContent='Task: '+t.task;card.append(top,brief);if(t.result){const output=document.createElement('div');output.className='agent-task-result';output.textContent=t.result;card.append(output)}host.append(card)});
+}
+
+
+let skillCatalogue=[];
+function bindSkills(){
+ const catalog=$('#skillCatalog'),select=$('#skillSelect'),form=$('#skillRunForm');
+ if(!catalog||!select||!form)return;
+ const result=$('#skillResult'),status=$('#skillStatus'),button=$('#runSkillButton'),input=$('#skillInput'),label=$('#skillInputLabel');
+ catalog.textContent='Loading approved skills…';select.innerHTML='';
+ fetch('/api/skills').then(async response=>{const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Could not load skill catalogue');skillCatalogue=Array.isArray(data.skills)?data.skills:[];catalog.innerHTML='';select.innerHTML='';
+  skillCatalogue.forEach(skill=>{
+   const tile=document.createElement('article');tile.className='skill-tile';
+   const name=document.createElement('b');name.textContent=skill.name;
+   const mode=document.createElement('small');mode.textContent=skill.mode==='local_deterministic'?'LOCAL · DETERMINISTIC':'AI · DRAFTING';
+   const desc=document.createElement('p');desc.textContent=skill.description;
+   tile.append(name,mode,desc);catalog.append(tile);
+   const option=document.createElement('option');option.value=skill.id;option.textContent=skill.name;select.append(option);
+  });
+  updateSkillInput();
+ }).catch(error=>{catalog.textContent=error.message;status.textContent=error.message});
+ function updateSkillInput(){const skill=skillCatalogue.find(item=>item.id===select.value);if(!skill)return;label.textContent=skill.inputLabel;input.maxLength=skill.id==='calculator'?200:8000;input.placeholder=skill.id==='calculator'?'Example: (1250 + 480) * 0.06':'Describe the material or outcome…';}
+ select.onchange=updateSkillInput;
+ form.onsubmit=async event=>{
+  event.preventDefault();const skill=select.value,value=input.value.trim();if(!skill||!value)return;
+  button.disabled=true;status.textContent='Running approved skill…';result.hidden=true;result.textContent='';
+  try{const response=await fetch('/api/skill-run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({skill,input:value,model:cfg.aiModel||undefined})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Skill execution failed');result.textContent=data.result||'No result returned.';result.hidden=false;status.textContent=(data.name||skill)+' · '+(data.mode==='local_deterministic'?'Local calculation':(data.model||'Gateway model'));}
+  catch(error){status.textContent=error.message;result.textContent=error.message;result.hidden=false;}
+  finally{button.disabled=false;}
+ };
 }
 
 function bindOrchestrator(){
@@ -227,6 +267,7 @@ function bindAgents(){
 function openPanel(key){const v=views[key]||views.settings;popTitle.textContent=v[0];popBody.innerHTML=v[1];popup.classList.add('open');const on=(id,fn)=>{let e=$('#'+id);if(e)e.onclick=fn};
 if(key==='chat')bindChat();
 if(key==='agents'){bindAgents();bindOrchestrator();}
+if(key==='skills')bindSkills();
 if(key==='auth'){fetch('/api/auth/session').then(r=>r.json()).then(d=>{if($('#authStatus'))$('#authStatus').textContent=d.authenticated?'Signed in.':'Not signed in.'}).catch(()=>{if($('#authStatus'))$('#authStatus').textContent='Backend not reachable.'});on('aresLogin',async()=>{const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#aresPassword').value})});const d=await r.json();$('#authStatus').textContent=r.ok?'Signed in successfully.':(d.error||'Sign-in failed.');if(r.ok){$('#aresPassword').value='';toast('Ares session started')}});on('aresLogout',async()=>{await fetch('/api/auth/logout',{method:'POST'});$('#authStatus').textContent='Signed out.';toast('Ares session ended')})}
 if(key==='voice'){on('startAresVoice',async()=>{try{const r=await fetch('/api/voice-token',{method:'POST'});const d=await r.json();if(!r.ok)throw new Error(d.error||'Voice unavailable');const {Conversation}=await import('https://esm.sh/@elevenlabs/client');window.aresConversation=await Conversation.startSession({signedUrl:d.signedUrl,onMessage:m=>{const el=$('#voiceTranscript');if(el&&m.message)el.textContent+='\\n'+m.message},onError:e=>toast('Voice error: '+(e.message||'connection failed'))});$('#voiceStatus').textContent='Connected to Ares voice.';orb.classList.add('listening')}catch(e){$('#voiceStatus').textContent=e.message;toast(e.message)}});on('endAresVoice',async()=>{try{await window.aresConversation?.endSession()}catch{}window.aresConversation=null;orb.classList.remove('listening');$('#voiceStatus').textContent='Voice is offline.'})}
 if(key==='ears'){on('startListen',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Speech recognition is not supported in this browser');return}recognition=new SR();recognition.continuous=true;recognition.lang='en-US';recognition.onresult=e=>$('#transcript').textContent=Array.from(e.results).map(x=>x[0].transcript).join(' ');recognition.onerror=e=>toast(e.error);recognition.start();orb.classList.add('listening');toast('Listening started')});on('stopListen',()=>{recognition?.stop();orb.classList.remove('listening');toast('Listening stopped')})}
