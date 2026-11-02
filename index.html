@@ -26,6 +26,37 @@
 .toast{position:fixed;z-index:30;bottom:18px;left:50%;transform:translate(-50%,10px);opacity:0;background:#102747;border:1px solid #68baff66;border-radius:22px;padding:10px 16px;font-size:11px;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:1150px){.app{grid-template-columns:205px minmax(430px,1fr);grid-template-rows:minmax(520px,1fr) 260px;gap:0 12px;padding-right:12px}.right{display:none}.floatcard{width:175px}.github{left:4%}.voice{left:0}.memory{left:2%}.vercel{right:2%}.ears,.eye{right:0}.chatbar{left:12%;right:12%}}
 @media(max-width:700px){html,body{overflow:auto}.app{height:auto;min-height:100dvh;display:flex;flex-direction:column;padding:0 12px 20px}.sidebar{border:0;padding:14px 4px 8px}.logo{margin:0 0 12px}.logo-orbit{width:32px;height:32px}.logo b{font-size:14px}.nav{display:flex;overflow:auto;gap:4px}.nav button{white-space:nowrap;padding:8px 10px;font-size:11px}.nav button span{font-size:13px}.profile{display:none}.center{height:650px;min-height:650px;overflow:hidden}.welcome{top:18px}.welcome h1{font-size:27px}.orbscene{width:330px;height:330px;top:48%}.floatcard{width:142px;padding:9px;border-radius:12px}.ficon{width:27px;height:27px}.floatcard b{font-size:10px}.floatcard small{font-size:9px}.state{margin-left:39px;font-size:9px}.github{left:0;top:25%}.voice{left:0;top:55%}.memory{left:0;top:78%}.vercel{right:0;top:25%}.ears{right:0;top:55%}.eye{right:0;top:78%}.chatbar{left:3%;right:3%;bottom:14px}.orbcaption{bottom:83px}.workflow{height:290px;flex:none;grid-column:auto;grid-row:auto}.canvas{grid-template-columns:115px 1fr}.flowarea{justify-content:flex-start}.flowNode{min-width:125px}.arrow{width:18px}.wtop{gap:4px;padding:0 7px;font-size:9px}.wtop button{padding:6px}.popup{right:10px;top:12px;max-height:88vh}}
+
+/* ARES Phase 1 — visual foundation, responsive behaviour and interaction clarity */
+:root{--bg:#070b16;--panel:#101a2bdc;--panel2:#132238;--line:#91a9cf30;--muted:#9aabc5;--text:#f2f6ff;--blue:#6be0d4;--violet:#a78bfa;--green:#67e8b4;--accent:#6be0d4;--accent-2:#a78bfa}
+html,body{background:radial-gradient(ellipse at 52% 34%,#172a43 0,#0a1424 42%,#050914 82%);scroll-behavior:smooth}
+button:focus-visible,input:focus-visible,video:focus-visible,[role=button]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button{transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+.nav button.active{background:linear-gradient(90deg,#24504f99,#1b315055);border-color:#6be0d455;box-shadow:inset 3px 0 0 var(--accent),0 8px 24px #02081155}
+.logo-orbit{border-color:var(--accent);box-shadow:0 0 16px #6be0d466,inset 0 0 13px #6be0d433}
+.logo-orbit:before,.logo-orbit:after{border-color:var(--violet)}
+.welcome h1 em{color:#b7a8ff}
+.energy{background:radial-gradient(circle at 50% 50%,#f3ffff 0,#baf9f0 3%,#52d8c9 8%,#3e75bd 22%,#7556cb 40%,#183b66 61%,#08172b 76%);box-shadow:0 0 22px #6be0d4,0 0 65px #3488ff88,0 0 140px #7656cb66,0 0 200px #2b9bff22,inset -22px -25px 50px #030817}
+.ring{border-top-color:#8ff3e8;border-bottom-color:#9d8bff;filter:drop-shadow(0 0 9px #6be0d4)}
+.floatcard,.boxpanel,.popup,.workflow{border-color:#8caed044}
+.floatcard{background:linear-gradient(145deg,#12243bdc,#0b1729e8)}
+.floatcard:hover{border-color:#6be0d4aa;background:#183149f2}
+.state{color:var(--green)}
+.chatbar{border-color:#6be0d477;background:linear-gradient(90deg,#10263aeF,#171d3deF);box-shadow:0 0 24px #238dff32,0 0 65px #523dff18}
+.chatbar button{background:linear-gradient(135deg,#6be0d4,#a78bfa)}
+.boxpanel{background:linear-gradient(150deg,#111f35e8,#0b1629e8)}
+.workflow{background:linear-gradient(180deg,#0d1b2fef,#070f1fee)}
+.flowNode{background:linear-gradient(145deg,#172c43,#0c1b2d)}
+.flowNode.green{border-color:#67e8b477}
+.popup{background:#0a1729f7}
+.action{border-color:#6be0d455;background:#173b46}
+.action:hover{background:#20525a;border-color:#6be0d4}
+.deploy{background:linear-gradient(110deg,#398f91,#7862c9)!important}
+@media(min-width:1500px){.app{grid-template-columns:260px minmax(540px,1fr) 330px;gap:0 22px;padding-right:28px}.welcome{top:38px}.workflow{min-height:300px}}
+@media(max-width:1150px) and (min-width:701px){.app{grid-template-columns:210px minmax(0,1fr);grid-template-rows:minmax(520px,1fr) 270px}.center{min-width:0}.workflow{min-width:0}.canvas{grid-template-columns:155px minmax(0,1fr)}}
+@media(max-width:700px){.sidebar{position:sticky;top:0;z-index:10;background:#071020f5;padding:10px 4px 8px;backdrop-filter:blur(16px)}.nav{scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.center{height:610px;min-height:610px}.orbscene{width:min(310px,78vw);height:min(310px,78vw)}.floatcard{width:clamp(118px,39vw,145px)}.chatbar{bottom:12px}.workflow{height:270px}.canvas{grid-template-columns:100px minmax(0,1fr)}.flowarea{overflow-x:auto;justify-content:flex-start}.popup{left:10px;right:10px;width:auto}.wtop{overflow-x:auto;white-space:nowrap}.wtop .spacer{min-width:8px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
 </style></head>
 <body>
 <div class="app">
@@ -40,16 +71,16 @@
  <div class="welcome"><h1 id="greeting">Good evening, <em>Alvin</em></h1><p>Your goals. My mission.</p></div>
  <div class="orbscene" id="orb" role="button" tabindex="0" aria-label="Activate Jarvis"><div class="energy"></div><div class="ring"></div><div class="ring two"></div><div class="ring three"></div></div>
  <button class="floatcard github" data-panel="github"><div class="frow"><div class="ficon">◉</div><div><b>GitHub</b><small>@alvinimau0-pixel/Ares</small></div></div><div class="state">Connected</div></button>
- <button class="floatcard voice" data-panel="voice"><div class="frow"><div class="ficon">♬</div><div><b>Chat / Voice</b><small>ElevenLabs</small></div></div><div class="state">Ready</div></button>
+ <button class="floatcard voice" data-panel="voice"><div class="frow"><div class="ficon">♬</div><div><b>Chat / Voice</b><small>ElevenLabs</small></div></div><div class="state">Agent configured</div></button>
  <button class="floatcard memory" data-panel="memory"><div class="frow"><div class="ficon">▣</div><div><b>Memory</b><small>Obsidian Vault</small></div></div><div class="state">Bridge needed</div></button>
  <button class="floatcard vercel" data-panel="vercel"><div class="frow"><div class="ficon">▲</div><div><b>Vercel</b><small>ares-intelligence</small></div></div><div class="state">Connected</div></button>
  <button class="floatcard ears" data-panel="ears"><div class="frow"><div class="ficon">◖</div><div><b>Ears</b><small>Listening input</small></div></div><div class="state">Standby</div></button>
- <button class="floatcard eye" data-panel="vision"><div class="frow"><div class="ficon">◎</div><div><b>Eye</b><small>Vision system</small></div></div><div class="state">Camera ready</div></button>
+ <button class="floatcard eye" data-panel="vision"><div class="frow"><div class="ficon">◎</div><div><b>Eye</b><small>Vision system</small></div></div><div class="state">Local preview</div></button>
  <div class="orbcaption"><span>✧ &nbsp; I'm here. What would you like to do?</span></div>
  <form class="chatbar" id="chatForm"><span style="color:#9edaff;font-size:19px">✧</span><input id="chatInput" placeholder="Ask Jarvis anything..." autocomplete="off"><button type="button" id="micButton" aria-label="Voice input">♩</button><button type="submit" aria-label="Send">➤</button></form>
 </section>
 <aside class="right">
- <div class="boxpanel"><div class="boxhead">⚡ Quick Actions</div><div class="quicklist">
+ <div class="boxpanel"><div class="boxhead">⚡ Quick Actions <span>Shortcuts</span></div><div class="quicklist">
  <button class="quickitem" data-action="github"><span class="qicon">◉</span><span><b>Open GitHub Repo</b><small>View my Ares repository</small></span><span style="margin-left:auto">›</span></button>
  <button class="quickitem" data-action="vercel"><span class="qicon">▲</span><span><b>Open Vercel</b><small>View production deployment</small></span><span style="margin-left:auto">›</span></button>
  <button class="quickitem" data-panel="voice"><span class="qicon">♬</span><span><b>Start Voice Call</b><small>Talk with ElevenLabs</small></span><span style="margin-left:auto">›</span></button>
@@ -57,9 +88,9 @@
  <button class="quickitem" data-panel="settings"><span class="qicon">⚙</span><span><b>Open Settings</b><small>Manage API keys & MCP</small></span><span style="margin-left:auto">›</span></button>
  </div></div>
  <div class="boxpanel"><div class="boxhead">🟢 System Status <span>Current setup</span></div>
- <div class="systemrow"><label><span class="sysicon">◉</span>GitHub</label><small>Connected</small></div><div class="systemrow"><label><span class="sysicon">▲</span>Vercel</label><small>Connected</small></div><div class="systemrow"><label><span class="sysicon">♬</span>ElevenLabs</label><small>Agent ready</small></div><div class="systemrow"><label><span class="sysicon">▣</span>Obsidian</label><small>Bridge needed</small></div><div class="systemrow"><label><span class="sysicon">⚙</span>MCP / APIs</label><small>Configure</small></div>
+ <div class="systemrow"><label><span class="sysicon">◉</span>GitHub</label><small>Connected</small></div><div class="systemrow"><label><span class="sysicon">▲</span>Vercel</label><small>Connected</small></div><div class="systemrow"><label><span class="sysicon">♬</span>ElevenLabs</label><small>API key required</small></div><div class="systemrow"><label><span class="sysicon">▣</span>Obsidian</label><small>Not connected</small></div><div class="systemrow"><label><span class="sysicon">⚙</span>MCP / APIs</label><small>Not connected</small></div>
  </div>
- <div class="boxpanel activity"><div class="boxhead">Activity Log <span>Recent</span></div>
+ <div class="boxpanel activity"><div class="boxhead">Activity Log <span>Last known events</span></div>
  <div class="activityrow"><span class="qicon">▲</span><div><b>Deployed to Vercel</b><small>ares-intelligence</small></div><time>Live</time></div>
  <div class="activityrow"><span class="qicon">◉</span><div><b>GitHub sync</b><small>alvinimau0-pixel/Ares</small></div><time>Synced</time></div>
  <div class="activityrow"><span class="qicon">♬</span><div><b>Voice agent created</b><small>ElevenLabs · Ares</small></div><time>Ready</time></div>
@@ -118,7 +149,7 @@ const chatHistory=[];$('#chatForm').onsubmit=async e=>{e.preventDefault();const 
 $('#micButton').onclick=()=>openPanel('ears');
 document.querySelector('.profile').onclick=()=>openPanel('auth');
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');toast(b.dataset.tab+' workspace selected')});
-$('#saveFlow').onclick=()=>toast('Workflow draft saved in this session');
-$('#deployFlow').onclick=()=>toast('Connect n8n backend to deploy workflows');
+$('#saveFlow').onclick=()=>toast('Workflow canvas is a preview; persistent saving is not connected yet.');
+$('#deployFlow').onclick=()=>toast('Workflow deployment is not connected. Configure n8n first.');
 function clock(){let h=new Date().getHours();$('#greeting').innerHTML=(h<12?'Good morning,':h<18?'Good afternoon,':'Good evening,')+' <em>Alvin</em>'}clock();setInterval(clock,60000);
 </script></body></html>
