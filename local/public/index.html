@@ -59,11 +59,11 @@ async function refreshHealth(){
   const a=data.brains?.claude||{},b=data.brains?.chatgpt||{};
   setText('claudeState',a.configured?'Configured':'Not configured');setText('claudeDetail',(a.provider||'anthropic')+' · '+(a.model||'Model not set'));dot('claudeDot',a.configured?'good':'warn');
   setText('chatgptState',b.configured?'Configured':'Not configured');setText('chatgptDetail',(b.provider||'openai')+' · '+(b.model||'Model not set'));dot('chatgptDot',b.configured?'good':'warn');
-  setText('jevState',data.jev?.keyConfigured?'Key configured':'Not configured');setText('jevDetail',data.jev?.keyConfigured?'Hosted TypeSafe JEV available for request':'Optional; chat remains available');dot('jevDot',data.jev?.keyConfigured?'good':'warn');
-  setText('modelAValue',a.model||'Not set');setText('modelBValue',b.model||'Not set');setText('jevKeyValue',data.jev?.keyConfigured?'Configured':'Missing');
+  setText('jevState',data.jev?.configured?'Configured':data.jev?.keyConfigured?'SDK missing':'Not configured');setText('jevDetail',data.jev?.configured?'Key and SDK detected; live request not yet verified':data.jev?.keyConfigured?'Install @typesafe-ai/sdk to enable JEV':'Optional; chat remains available');dot('jevDot',data.jev?.configured?'good':'warn');
+  setText('modelAValue',a.model||'Not set');setText('modelBValue',b.model||'Not set');setText('jevKeyValue',data.jev?.configured?'Key + SDK':data.jev?.keyConfigured?'Key only · SDK missing':'Missing');
   setText('healthStatus','Configuration loaded. Upstream connectivity is verified only when a chat request succeeds.');
  }catch(error){
-  health=null;setText('hermesState','Unavailable');setText('hermesDetail',error.message);dot('hermesDot','bad');setText('bridgeValue','Offline');setText('healthStatus',error.message);
+  health=null;setText('hermesState','Unavailable');setText('hermesDetail',error.message);dot('hermesDot','bad');setText('bridgeValue','Offline');setText('keyValue','Unknown');setText('modelAValue','Unknown');setText('modelBValue','Unknown');setText('jevKeyValue','Unknown');setText('healthStatus',error.message);
   for(const id of ['claudeState','chatgptState','jevState'])setText(id,'Unknown');
   for(const id of ['claudeDot','chatgptDot','jevDot'])dot(id,'bad');
  }finally{button.disabled=false}
