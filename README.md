@@ -34,3 +34,16 @@ The API foundation is committed. Live chat, voice, and persistent memory require
 ## ARES orchestration limits
 
 The AI Workforce panel supports both manual specialist assignments and an ARES mission flow. Orchestration plans with a fixed role allowlist, runs up to three specialist calls sequentially, and synthesizes successful findings. This is AI reasoning and drafting only: it does not run shell commands, modify files, call connected accounts, or execute external workflows. Results are session-only in the browser. Owner authentication and AI Gateway configuration are required.
+
+## ARES skills and capability layer
+
+The authenticated Skills panel reads the allowlisted catalogue from `GET /api/skills` and runs a selected skill through `POST /api/skill-run`.
+
+Built-in skills:
+- Project Planner — AI-assisted planning and drafting.
+- Risk & Controls Review — qualitative risk review and controls.
+- Technical Reviewer — technical gap and quality review.
+- Meeting & Action Extractor — structured notes and action extraction.
+- Safe Calculator — deterministic arithmetic evaluated locally without `eval` or an AI call.
+
+All skill endpoints require the existing owner session and origin checks. AI skills require configured AI Gateway authentication. The runner does not execute arbitrary code, shell commands, filesystem changes, external network requests, or connected-account actions. Tool connectors must be added as separate explicit allowlisted capabilities with their own permission and approval policies.
