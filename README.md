@@ -47,3 +47,20 @@ Built-in skills:
 - Safe Calculator — deterministic arithmetic evaluated locally without `eval` or an AI call.
 
 All skill endpoints require the existing owner session and origin checks. AI skills require configured AI Gateway authentication. The runner does not execute arbitrary code, shell commands, filesystem changes, external network requests, or connected-account actions. Tool connectors must be added as separate explicit allowlisted capabilities with their own permission and approval policies.
+
+## Tool integrations and permission engine
+
+The Plugins & MCP workspace is now the ARES Connector Registry.
+
+### Available capabilities
+- GitHub Repository Reader: authenticated read-only access to individual text files in the fixed repository alvinimau0-pixel/Ares. Configure a least-privilege server-side GITHUB_TOKEN with Contents: read. The connector is reported as not configured until that environment variable exists. Reads are capped at 64 KB.
+- AI Gateway: model reasoning and drafting through the existing server-side gateway configuration.
+
+### Permission policy
+- Read-only file access and allowlisted AI skills/orchestration are allowed.
+- File creation/update is approval-required but has no write executor in this phase.
+- Deletion, deployment and credential management are blocked.
+- External account actions are approval-required but no executor is connected.
+- POST /api/permission-check evaluates a policy only. Its response always states executed: false.
+
+All endpoints require the existing ARES owner session and allowed origin. GitHub tokens must be stored as server-side environment variables and must never be placed in frontend code, local storage, or chat messages. This phase does not connect arbitrary MCP servers, run shell commands, or change repository contents.
