@@ -1,0 +1,19 @@
+{
+  "brainA": {
+    "label": "Claude",
+    "providerEnv": "BRAIN_A_PROVIDER",
+    "modelEnv": "BRAIN_A_MODEL",
+    "defaultProvider": "anthropic"
+  },
+  "brainB": {
+    "label": "ChatGPT",
+    "providerEnv": "BRAIN_B_PROVIDER",
+    "modelEnv": "BRAIN_B_MODEL",
+    "defaultProvider": "openai"
+  },
+  "routing": {
+    "engine": "Hermes Agent",
+    "structuredDecisionProvider": "TypeSafe JEV",
+    "automaticFallbackBetweenBrains": false
+  }
+}
